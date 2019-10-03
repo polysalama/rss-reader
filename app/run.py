@@ -58,7 +58,6 @@ async def run_debug_smtp():
     await IOLoop.current().run_in_executor(None, DebuggingServer, ('localhost', 1025), None)
 
 if __name__ == '__main__':
-    print("tesmt1", flush=True)
     app = make_app()
     connect_to_db(app)
     create_tables(app.db)

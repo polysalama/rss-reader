@@ -1,7 +1,9 @@
 {
+    # App settings
     "port": 8080,
     "debug": "True",
 
+    # Db connection settings
     "db_name": "rss",
     "db_user": "rss",
     "db_password": "rss",
