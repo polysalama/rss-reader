@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  postgres:
+    build: ./database
+    env_file: ./database/db.env
+  app:
+    build: ./app
+    links:
+      - postgres
+    ports:
+      - "8080:8080"
+    command: --db_host=postgres
