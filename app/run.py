@@ -49,13 +49,20 @@ def connect_to_db(app):
                 exit(1)
 
 def create_tables(db):
-    with open("schema.sql") as f:
+    with open('schema.sql') as f:
             schema = f.read()
     db.execute(schema)
 
+async def run_debug_smtp():
+    from smtpd import DebuggingServer
+    await IOLoop.current().run_in_executor(None, DebuggingServer, ('localhost', 1025), None)
+
 if __name__ == '__main__':
+    print("tesmt1", flush=True)
     app = make_app()
     connect_to_db(app)
     create_tables(app.db)
     app.listen(app.settings['port'])
+    if app.settings['debug']:
+        IOLoop.current().run_sync(lambda: run_debug_smtp())
     IOLoop.current().start()
