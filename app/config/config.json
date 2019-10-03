@@ -1,4 +1,10 @@
 {
     "port": 8080,
-    "debug": "True"
+    "debug": "True",
+
+    "db_name": "rss",
+    "db_user": "rss",
+    "db_password": "rss",
+    "db_host": "postgres",
+    "db_port": 5432
 }

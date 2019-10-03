@@ -1,15 +1,15 @@
-CREATE TABLE "users" (
+CREATE TABLE IF NOT EXISTS "users" (
   id SERIAL PRIMARY KEY,
   email VARCHAR,
   created_at TIMESTAMP
 );
 
-CREATE TABLE "rss" (
+CREATE TABLE IF NOT EXISTS "rss" (
   id SERIAL PRIMARY KEY,
   name VARCHAR
 );
 
-CREATE TABLE "rss_items" (
+CREATE TABLE IF NOT EXISTS "rss_items" (
   pub_date DATE,
   title VARCHAR,
   description VARCHAR,
@@ -17,12 +17,12 @@ CREATE TABLE "rss_items" (
   rss_id INTEGER REFERENCES users(id)
 );
 
-CREATE TABLE "users_rss" (
+CREATE TABLE IF NOT EXISTS "users_rss" (
   user_id INTEGER REFERENCES users(id),
   rss_id INTEGER REFERENCES rss(id)
 );
 
-CREATE TABLE "user_logins" (
+CREATE TABLE IF NOT EXISTS "user_logins" (
   login_date DATE,
   user_id INTEGER REFERENCES users(id)
 );

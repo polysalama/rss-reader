@@ -1,6 +1,10 @@
-import tornado.ioloop
-import tornado.web
+from tornado.ioloop import IOLoop
+from tornado import web
+from momoko.exceptions import PartiallyConnectedError
+from time import sleep
 import json
+import momoko
+
 
 def get_config():
     try:
@@ -14,17 +18,44 @@ def get_config():
         exit(2)
     return config
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(web.RequestHandler):
     def get(self):
-        self.write("Hello, world")
+        self.write('Hello, world')
 
-def make_app(config):
-    return tornado.web.Application([
-        (r"/", MainHandler),
-    ], **config)
+def make_app():
+    app = web.Application([(r'/', MainHandler)], **get_config())
+    return app
 
-if __name__ == "__main__":
-    config = get_config()
-    app = make_app(config)
-    app.listen(config["port"])
-    tornado.ioloop.IOLoop.current().start()
+def connect_to_db(app):
+    i = 1
+    while True:
+        try:
+            dns = (
+            f'dbname={app.settings["db_name"]} '
+            f'user={app.settings["db_user"]} '
+            f'password={app.settings["db_password"]} '
+            f'host={app.settings["db_host"]} '
+            f'port={app.settings["db_port"]} '
+            )
+            app.db = momoko.Pool(dns, size=1, ioloop=IOLoop.current())
+            IOLoop.current().run_sync(lambda: app.db.connect())
+            break
+        except PartiallyConnectedError as e:
+            if i < 5:
+                i = i + 1
+                sleep(1)
+                continue
+            else:
+                exit(1)
+
+def create_tables(db):
+    with open("schema.sql") as f:
+            schema = f.read()
+    db.execute(schema)
+
+if __name__ == '__main__':
+    app = make_app()
+    connect_to_db(app)
+    create_tables(app.db)
+    app.listen(app.settings['port'])
+    IOLoop.current().start()
