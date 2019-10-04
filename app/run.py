@@ -4,6 +4,7 @@ from momoko.exceptions import PartiallyConnectedError
 from time import sleep
 import json
 import momoko
+from handlers import login
 
 
 def get_config():
@@ -16,14 +17,11 @@ def get_config():
     except OSError as error:
         print(error.strerror)
         exit(2)
+    config['template_path']= './templates'
     return config
 
-class MainHandler(web.RequestHandler):
-    def get(self):
-        self.write('Hello, world')
-
 def make_app():
-    app = web.Application([(r'/', MainHandler)], **get_config())
+    app = web.Application([(r'/', login.MainHandler)], **get_config())
     return app
 
 def connect_to_db(app):
@@ -53,9 +51,9 @@ def create_tables(db):
             schema = f.read()
     db.execute(schema)
 
-async def run_debug_smtp():
+def run_debug_smtp():
     from smtpd import DebuggingServer
-    await IOLoop.current().run_in_executor(None, DebuggingServer, ('localhost', 1025), None)
+    IOLoop.current().run_in_executor(None, DebuggingServer, ('localhost', 1025), None)
 
 if __name__ == '__main__':
     app = make_app()
@@ -63,5 +61,5 @@ if __name__ == '__main__':
     create_tables(app.db)
     app.listen(app.settings['port'])
     if app.settings['debug']:
-        IOLoop.current().run_sync(lambda: run_debug_smtp())
+        run_debug_smtp()
     IOLoop.current().start()
