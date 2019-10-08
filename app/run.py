@@ -52,8 +52,20 @@ def create_tables(db):
     db.execute(schema)
 
 def run_debug_smtp():
-    from smtpd import DebuggingServer
-    IOLoop.current().run_in_executor(None, DebuggingServer, ('localhost', 1025), None)
+    from aiosmtpd.smtp import SMTP
+    from aiosmtpd.controller import Controller
+
+    class DebugHandler:
+        async def handle_DATA(self, server, session, envelope):
+            print('Message from %s' % envelope.mail_from)
+            print('Message for %s' % envelope.rcpt_tos)
+            print('Message data:\n')
+            print(envelope.content.decode('utf8', errors='replace'), flush=True)
+            print('End of message')
+            return '250 Message accepted for delivery'
+
+    controller = Controller(DebugHandler(), hostname='0.0.0.0', port=1025)
+    controller.start()
 
 if __name__ == '__main__':
     app = make_app()
