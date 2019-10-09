@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS "users" (
   id SERIAL PRIMARY KEY,
-  email VARCHAR,
-  created_at TIMESTAMP
+  email TEXT NOT NULL UNIQUE,
+  password  bytea NOT NULL,
+  created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "rss" (

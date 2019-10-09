@@ -4,7 +4,7 @@ from momoko.exceptions import PartiallyConnectedError
 from time import sleep
 import json
 import momoko
-from handlers import login
+from handlers import login, register, rss_reader
 
 
 def get_config():
@@ -17,11 +17,17 @@ def get_config():
     except OSError as error:
         print(error.strerror)
         exit(2)
-    config['template_path']= './templates'
+    config['template_path'] = './templates'
+    config['login_url'] = '/login'
     return config
 
 def make_app():
-    app = web.Application([(r'/', login.MainHandler)], **get_config())
+    app = web.Application([(r'/', login.LoginHandler),
+                           (r'/login', login.LoginHandler),
+                           (r'/register', register.RegisterHandler),
+                           (r'/rss_reader', rss_reader.RssHandler)],
+                           #cookie_secret="37347636", 
+                           **get_config())
     return app
 
 def connect_to_db(app):
