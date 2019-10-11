@@ -1,7 +1,8 @@
 from tornado import web
-from tornado.ioloop import IOLoop
 from .base import BaseHandler
-import bcrypt
+from daos.userDao import UserDao
+from models.user import User
+
 
 class LoginHandler(BaseHandler):
     async def get(self):
@@ -11,20 +12,16 @@ class LoginHandler(BaseHandler):
             self.render('index.html')
 
     async def post(self):
-        sql = 'SELECT password FROM users WHERE email=%s'
         email = self.get_body_argument('email')
         input_password = self.get_body_argument('password').encode()
-        cursor = await self.application.db.execute(sql, [email])
-        hashed_password = cursor.fetchone()
-        if hashed_password is None:
-            self.write('No such user!')
-            return
-        check_password = await IOLoop.current().run_in_executor(None, 
-                lambda: bcrypt.checkpw(input_password, 
-                                       hashed_password[0].tobytes()))   
-        if check_password:
-            print(self.settings, flush=True) 
-            self.set_secure_cookie("user", email)
-            self.redirect('/rss_reader')
+        user = User(email=email)
+        user = await UserDao.get(user, get_by='email')
+        if user:
+            if await user.check_password(input_password):
+                self.set_secure_cookie("user_id", str(user.id))
+                self.redirect('/rss_reader')
+            else:
+                self.write('Wrong password')
         else:
-            self.write('Wrong password')
+            self.write('No such user!')
+

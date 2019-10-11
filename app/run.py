@@ -5,6 +5,7 @@ from time import sleep
 import json
 import momoko
 from handlers import login, register, rss_reader
+from daos.dao import Dao
 
 
 def get_config():
@@ -25,8 +26,8 @@ def make_app():
     app = web.Application([(r'/', login.LoginHandler),
                            (r'/login', login.LoginHandler),
                            (r'/register', register.RegisterHandler),
-                           (r'/rss_reader', rss_reader.RssHandler)],
-                           #cookie_secret="37347636", 
+                           (r'/rss_reader', rss_reader.RssHandler),
+                           (r'/register_ok', register.RegisterSuccessHandler)],
                            **get_config())
     return app
 
@@ -43,6 +44,7 @@ def connect_to_db(app):
             )
             app.db = momoko.Pool(dns, size=1, ioloop=IOLoop.current())
             IOLoop.current().run_sync(lambda: app.db.connect())
+            Dao.DB = app.db
             break
         except PartiallyConnectedError as e:
             if i < 5:
