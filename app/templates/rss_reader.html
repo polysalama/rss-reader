@@ -1,76 +1,72 @@
-<!DOCTYPE html>
-<html>
-  <head>
-      <style>
-          .collapsible {
-            background-color: #777;
-            color: white;
-            cursor: pointer;
-            padding: 18px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-          }
-          
-          .active, .collapsible:hover {
-            background-color: #555;
-          }
-          
-          .content {
-            padding: 0 18px;
-            display: none;
-            overflow: hidden;
-            background-color: #f1f1f1;
-          }
-          </style>
-  </head>
-  <body>
-    <form action="/rss_reader" method="POST">
-        <br>
-        New RSS:
-        <input type="text" name="rss_link">
-        <input type="submit" value="Add RSS">
-    </form> 
+{% extends "base.html" %}
 
-    <h2>Collapsibles</h2>
-
-<p>A Collapsible:</p>
-<button type="button" class="collapsible">Open Collapsible</button>
-<div class="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-</div>
-
-<p>Collapsible Set:</p>
-<button type="button" class="collapsible">Open Section 1</button>
-<div class="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-</div>
-<button type="button" class="collapsible">Open Section 2</button>
-<div class="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-</div>
-<button type="button" class="collapsible">Open Section 3</button>
-<div class="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-</div>
-
-<script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
-
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
+{% block sytle %}
+  <style>
+    .collapsible {
+      background-color: #777;
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
     }
-  });
-}
-</script>
-  </body>
-</html>
+    
+    .active, .collapsible:hover {
+      background-color: #555;
+    }
+    
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+    }
+    .item {
+      border-top:2px solid #f00
+    }
+
+  </style>
+{% end %}
+{% block content %}
+  <form action="/rss_reader" method="POST">
+      <br>
+      New RSS:
+      <input type="text" name="rss_link" required>
+      <input type="submit" value="Add RSS" required>
+  </form> 
+
+  <h2>Rss Feed</h2>
+
+  {% for rss in rss_feed %}
+    <button type="button" class="collapsible">{{ escape(rss[0].title) }}</button>
+    <div class="content">
+    {% for item in rss[1] %}
+        <p class="item">{{ escape(item['title']) }}</p>
+        <p>{{ escape(item['description']) }}</p>
+        <p><a href={{ escape(item['link']) }}>Read More</a></p>
+        <p>{{ escape(item['pubDate']) }}</p>
+    {% end %}
+    </div>
+  {% end %}
+
+{% end %}
+{% block scripts %}
+  <script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+  </script>
+{% end %}

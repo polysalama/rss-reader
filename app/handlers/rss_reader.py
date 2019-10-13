@@ -2,52 +2,38 @@ from tornado import web
 from tornado.httpclient import AsyncHTTPClient
 from .base import BaseHandler
 from daos.rssDao import RssDao
-from models.rss import Rss
-from xmlschema import XMLSchema
-from tornado.ioloop import IOLoop
-import defusedxml.ElementTree as ET
+from models.rss import Rss, RssParser
+from daos.usersRssDao import UsersRssDao
+from models.users_rss import UsersRss
+from models.user import User
+from tornado.template import Template
 
 class RssHandler(BaseHandler):
     @web.authenticated
     async def get(self):
-        self.render('rss_reader.html')
+        all_rss = await UsersRssDao.get_all_user_rss(User(id=self.get_current_user().decode()))
+        rss_content = await RssParser.fetch_all_rss_content(all_rss)
+        rss_content = await RssParser.parse_list_of_rss_xmls(rss_content)
+        self.render('rss_reader.html', rss_feed=list(zip(all_rss, rss_content)))
 
     @web.authenticated
     async def post(self):
         rss_link = self.get_body_argument('rss_link')
         rss = Rss(link=rss_link)
-        if await RssDao.exists(rss):
-            self.write('exist')
-        else:
+        return_rss = await RssDao.get(rss)
+        if not return_rss:
             http_client = AsyncHTTPClient()
             try:
                 response = await http_client.fetch(rss_link)
             except Exception as e:
-                print("Error: %s" % e)
+                self.render('rss_reader.html', rss_feed=list(zip(all_rss, rss_content)))
+                return
+            tree = await RssParser.xml_to_tree(response.body)
+            if tree and await RssParser.rss_is_valid(tree):
+                rss.title = await RssParser.rss_feed_title(tree)
+                rss = await RssDao.save(rss) 
             else:
-                tree = await RssParser.xml_to_tree(response.body)
-                if await RssParser.rss_is_valid(tree):
-                    rss.title = await RssParser.rss_feed_title(tree)
-                    await RssDao.save(rss)
-                    self.redirect('/rss_reader')
-                else:
-                    self.write('false rss')
-
-class RssParser:
-
-    xml_schema = XMLSchema('rss_schema.xsd')
-
-    @staticmethod
-    async def rss_is_valid(tree):
-        return await IOLoop.current().run_in_executor(None, lambda: RssParser.xml_schema.is_valid(tree))
-
-    @staticmethod
-    async def xml_to_tree(xml):
-        return await IOLoop.current().run_in_executor(None, lambda: ET.fromstring(xml))
-
-    @staticmethod
-    async def rss_feed_title(tree):
-        return await IOLoop.current().run_in_executor(None, lambda: tree.find('channel').find('title').text)
-
-
-    
+                self.write('not valid rss')
+                return
+        await UsersRssDao.save(User(id=self.get_current_user().decode()), rss)
+        self.redirect('/rss_reader')
