@@ -16,7 +16,7 @@ class RegisterHandler(web.RequestHandler):
         user = User(email=email,
                created_at=datetime.now())
         if await UserDao.get(user, get_by='email') is not None:
-            self.render('login.html', status='bad_register')
+            await self.render('login.html', status='bad_register')
             return
         reg_user = await UserDao.save(User(email=email, 
                                            password=await User.hash_password(password), 

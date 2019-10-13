@@ -16,3 +16,10 @@ class UsersRssDao(Dao):
         cursor = await UsersRssDao.DB.execute(sql, [user.id])
         results = cursor.fetchall()
         return list(map(lambda item: Rss(item[0], item[1], item[2]), results))
+
+    @staticmethod
+    async def rss_set_to_user(user, rss):
+        sql = 'SELECT EXISTS (SELECT rss.rss_id, rss.title, rss.link FROM users_rss INNER JOIN rss ON  rss.rss_id = users_rss.rss_id WHERE users_rss.user_id=%s AND users_rss.rss_id=%s)'
+        cursor = await UsersRssDao.DB.execute(sql, [user.id, rss.id])
+        result = cursor.fetchone()
+        return result[0]

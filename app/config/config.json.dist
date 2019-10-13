@@ -10,6 +10,10 @@
     "db_host": "postgres",
     "db_port": 5432
 
+    # Redis settings
+    "redis_host": "redis",
+    "redis_port": 6379,
+
     # Smtp connection settings
     "smpt_host": "0.0.0.0",
     "smpt_port": "1025",

@@ -30,6 +30,10 @@
   </style>
 {% end %}
 {% block content %}
+<form action="/logout" method="GET">
+  <input type="submit" value="Logout" style="float: right;">
+</form> 
+
   <form action="/rss_reader" method="POST">
       <br>
       New RSS:
@@ -37,12 +41,13 @@
       <input type="submit" value="Add RSS" required>
   </form> 
 
+
   <h2>Rss Feed</h2>
 
   {% for rss in rss_feed %}
-    <button type="button" class="collapsible">{{ escape(rss[0].title) }}</button>
+    <button type="button" class="collapsible">{{ escape(rss['rss_title']) }}</button>
     <div class="content">
-    {% for item in rss[1] %}
+    {% for item in rss['feed'] %}
         <p class="item">{{ escape(item['title']) }}</p>
         <p>{{ escape(item['description']) }}</p>
         <p><a href={{ escape(item['link']) }}>Read More</a></p>

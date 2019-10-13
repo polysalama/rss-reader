@@ -37,11 +37,11 @@ class RssParser:
         return [response.body for response in responses]
 
     @staticmethod
-    async def parse_list_of_rss_xmls(rss_list):
-        return await multi ([RssParser.parse_rss_content_to_list(rss_xml) for rss_xml in rss_list])
+    async def parse_list_of_rss_xmls(rss_list, all_rss):
+        return await multi ([RssParser.parse_rss_content_to_list(rss_xml, rss.title) for rss_xml, rss in zip(rss_list, all_rss)])
 
     @staticmethod
-    async def parse_rss_content_to_list(rss_xml):
+    async def parse_rss_content_to_list(rss_xml, rss_title):
         return_list = []
         tree = await RssParser.xml_to_tree(rss_xml)
         channel = await IOLoop.current().run_in_executor(None, lambda: tree.find('channel'))
@@ -51,8 +51,4 @@ class RssParser:
             for item in items:
                 item_children = list(item)
                 return_list.append(dict(map(lambda x: (x.tag, x.text), item_children)))
-        return return_list
-        
-
-    
-                
+        return {'rss_title': rss_title, 'feed': return_list}

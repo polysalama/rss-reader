@@ -4,6 +4,7 @@ from momoko.exceptions import PartiallyConnectedError
 from time import sleep
 import json
 import momoko
+import aioredis
 from handlers import login, register, rss_reader
 from daos.dao import Dao
 
@@ -22,9 +23,20 @@ def get_config():
     config['login_url'] = '/login'
     return config
 
+class Application(web.Application):
+    def __init__(self, **settings):
+        self.redis = None
+        super(Application, self).__init__(**settings)
+
+def connect_to_redis(app):
+    app.redis = IOLoop.current() \
+                .run_sync(lambda: aioredis \
+                .create_redis_pool(f'redis://{app.settings["redis_host"]}:{app.settings["redis_port"]}'))
+
 def make_app():
-    app = web.Application([(r'/', login.LoginHandler),
+    app = web.Application([(r'/', login.RedirectHandler),
                            (r'/login', login.LoginHandler),
+                           (r'/logout', login.LogoutHandler),
                            (r'/register', register.RegisterHandler),
                            (r'/rss_reader', rss_reader.RssHandler),
                            (r'/register_ok', register.RegisterSuccessHandler)],
@@ -79,6 +91,7 @@ if __name__ == '__main__':
     app = make_app()
     connect_to_db(app)
     create_tables(app.db)
+    connect_to_redis(app)
     app.listen(app.settings['port'])
     if app.settings['debug']:
         run_debug_smtp()

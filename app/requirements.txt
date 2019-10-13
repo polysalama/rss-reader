@@ -5,3 +5,4 @@ aiosmtpd
 bcrypt==3.1.7
 defusedxml==0.6.0
 xmlschema==1.0.14
+aioredis
