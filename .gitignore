@@ -1,3 +1,2 @@
 /app/config/config.json
-/database/db.env
 *.pyc

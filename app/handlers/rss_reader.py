@@ -18,7 +18,6 @@ class RssHandler(BaseHandler):
         user_id = self.get_current_user().decode()
         try:
             ref = self.request.headers['Referer'].split('/')[-1]
-            print(ref, flush=True)
             if ref == 'login':
                 await UserHistoryDao.save(UserHistory(date=datetime.now(), user_id=user_id))
         except KeyError:
@@ -59,7 +58,6 @@ class RssHandler(BaseHandler):
                 self.redirect('/rss_reader')
                 #TODO ERROR MESSAGE
                 return
-        print(await UsersRssDao.rss_set_to_user(user, rss), flush=True)
         if not await UsersRssDao.rss_set_to_user(user, rss):
             await UsersRssDao.save(user, rss)
             await self.application.redis.delete(user_id)
