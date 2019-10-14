@@ -30,7 +30,7 @@ Written in python 3.7, using tornado, postgres and redis.
 - Remove settings comments.
 - If you change port and host settings change them accordingly in docker and docker-compose files
 
-### Runing
+### Running
 
 - Run ```docker-compose up -d --build; docker-compose logs -f app``` to see the email sent from the debug email server.
 
@@ -38,9 +38,9 @@ Written in python 3.7, using tornado, postgres and redis.
 
 - Enter user name and password, click register
 - If using default setup it should display debug email in the console.
-- Refresh the page and you will be redirected to back to login
+- Refresh the page and you will be redirected back to login
 - Enter user name and password, click login
-- Add your rss xml link
+- Add your rss xml links
 
 ## TODO
 
