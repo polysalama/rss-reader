@@ -8,3 +8,6 @@ services:
       - ./app:/usr/src/app
     ports:
       - "1025:1025"
+  redis:
+    ports:
+      - "6379:6379"

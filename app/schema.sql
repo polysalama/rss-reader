@@ -11,20 +11,12 @@ CREATE TABLE IF NOT EXISTS "rss" (
   link TEXT
 );
 
-CREATE TABLE IF NOT EXISTS "rss_items" (
-  pub_date DATE,
-  title VARCHAR,
-  description VARCHAR,
-  link VARCHAR,
-  rss_id INTEGER REFERENCES rss(rss_id)
-);
-
 CREATE TABLE IF NOT EXISTS "users_rss" (
   user_id INTEGER REFERENCES users(user_id),
   rss_id INTEGER REFERENCES rss(rss_id)
 );
 
-CREATE TABLE IF NOT EXISTS "user_logins" (
-  login_date DATE,
+CREATE TABLE IF NOT EXISTS "user_history" (
+  login_date TIMESTAMP,
   user_id INTEGER REFERENCES users(user_id)
 );

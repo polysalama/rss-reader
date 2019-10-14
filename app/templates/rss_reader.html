@@ -44,17 +44,27 @@
 
   <h2>Rss Feed</h2>
 
-  {% for rss in rss_feed %}
-    <button type="button" class="collapsible">{{ escape(rss['rss_title']) }}</button>
-    <div class="content">
-    {% for item in rss['feed'] %}
-        <p class="item">{{ escape(item['title']) }}</p>
-        <p>{{ escape(item['description']) }}</p>
-        <p><a href={{ escape(item['link']) }}>Read More</a></p>
-        <p>{{ escape(item['pubDate']) }}</p>
-    {% end %}
+  <div style="display: flex;">
+    <div style="width: 80%">
+      {% for rss in rss_feed %}
+        <button type="button" class="collapsible">{{ escape(rss['rss_title']) }}</button>
+        <div class="content">
+        {% for item in rss['feed'] %}
+            <p class="item">{{ escape(item['title']) }}</p>
+            <p>{{ escape(item['description']) }}</p>
+            <p><a href={{ escape(item['link']) }}>Read More</a></p>
+            <p>{{ escape(item['pubDate']) }}</p>
+        {% end %}
+        </div>
+      {% end %}
     </div>
-  {% end %}
+    <div style="flex-grow: 1;">
+      <p align="middle">User Login History:</p>
+      {% for date in history %}
+        <p class="item">{{ escape(date) }}</p>
+      {% end %}
+    </div>
+  </div>
 
 {% end %}
 {% block scripts %}
