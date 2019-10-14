@@ -7,6 +7,8 @@ class RssDao(Dao):
 
     @staticmethod
     async def save(rss):
+        # Inserts new Rss and return it
+        
         sql = 'INSERT INTO rss (title, link) VALUES (%s, %s) RETURNING rss_id'
         cursor = await RssDao.DB.execute(sql, [rss.title, 
                                                rss.link])
@@ -17,6 +19,8 @@ class RssDao(Dao):
 
     @staticmethod
     async def get(rss):
+        # Retrieves rss by id
+        
         sql = 'SELECT * FROM rss WHERE link=%s'
         cursor = await RssDao.DB.execute(sql, [rss.link])
         result = cursor.fetchone()
@@ -29,6 +33,8 @@ class RssDao(Dao):
 
     @staticmethod
     async def exists(rss):
+        # Checks for existing rss
+
         sql = 'SELECT EXISTS (SELECT 1 FROM rss WHERE link=%s)'
         cursor = await RssDao.DB.execute(sql, [rss.link])
         return cursor.fetchone()[0]

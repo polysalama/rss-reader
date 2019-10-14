@@ -13,10 +13,16 @@ from datetime import datetime
 import json
 
 class RssHandler(BaseHandler):
+    # Handles users rss feed
+
     @web.authenticated
     async def get(self):
+        # Saves user visit history and displays users feed
+        # Uses redis for to cache rss feed (dumped to json)
+
         user_id = self.get_current_user().decode()
         try:
+            # Save login only if redirected from /login
             ref = self.request.headers['Referer'].split('/')[-1]
             if ref == 'login':
                 await UserHistoryDao.save(UserHistory(date=datetime.now(), user_id=user_id))
@@ -36,13 +42,18 @@ class RssHandler(BaseHandler):
 
     @web.authenticated
     async def post(self):
+        # Adds a new rss to the database if non existant
+        # If it's already already in the db it just relates it to the user
+
         user_id = self.get_current_user().decode()
         user = User(id=user_id)
         rss_link = self.get_body_argument('rss_link')
         rss = Rss(link=rss_link)
         rss = await RssDao.get(rss)
+        # Do not retrive it if exists in db
         if not rss:
             rss = Rss(link=rss_link)
+            # Retrives the xml to read the title
             http_client = AsyncHTTPClient()
             try:
                 response = await http_client.fetch(rss_link)
@@ -50,6 +61,8 @@ class RssHandler(BaseHandler):
                 self.redirect('/rss_reader')
                 #TODO ERROR MESSAGE
                 return
+                
+            # Validate xml
             tree = await RssParser.xml_to_tree(response.body)
             if tree and await RssParser.rss_is_valid(tree):
                 rss.title = await RssParser.rss_feed_title(tree)

@@ -12,12 +12,16 @@ class User():
             self.created_at=created_at
     
     async def check_password(self, input_password):
+        # Checks hashed and input password
+
         matching = await IOLoop.current().run_in_executor(None, 
                 lambda: bcrypt.checkpw(input_password, 
                                        self.password))
         return matching
 
     async def send_email(self, smtp_client, email_body):
+        # Sends conformation mail to user
+
         message = MIMEMultipart('alternative')
         message['From'] = 'root@localhost'
         message['To'] = self.email

@@ -5,6 +5,8 @@ from models.user import User
 
 
 class LoginHandler(BaseHandler):
+    # Handles user login
+
     async def get(self):
         if self.current_user:
             self.redirect('/rss_reader')
@@ -12,6 +14,8 @@ class LoginHandler(BaseHandler):
             await self.render('login.html', status='')
 
     async def post(self):
+        # Checks username and password if ok, sets cookie and redirects
+
         email = self.get_body_argument('email')
         input_password = self.get_body_argument('password').encode()
         user = User(email=email)
@@ -23,6 +27,7 @@ class LoginHandler(BaseHandler):
             self.redirect('/rss_reader')
 
 class LogoutHandler(BaseHandler):
+    # Handles user logout
     
     @web.authenticated
     async def get(self):
@@ -31,7 +36,8 @@ class LogoutHandler(BaseHandler):
         self.redirect('/')
 
 class RedirectHandler(BaseHandler):
-    
+    # Used to redirect / to login
+
     async def get(self):
         self.redirect('/login')
 

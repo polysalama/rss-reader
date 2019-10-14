@@ -6,11 +6,14 @@ from aiosmtplib import SMTP
 import bcrypt
 
 class RegisterHandler(web.RequestHandler):
+    # Handles user registration
 
     async def get(self):
         await self.render('login.html', status='')
 
     async def post(self):
+        # Saves the new user and send an email
+
         email = self.get_body_argument('email')
         password = self.get_body_argument('password').encode()
         user = User(email=email,
@@ -29,6 +32,7 @@ class RegisterHandler(web.RequestHandler):
         self.redirect('/register_ok')
 
 class RegisterSuccessHandler(web.RequestHandler):
+    # Handles redirect on successful login
 
     async def get(self):
         try:

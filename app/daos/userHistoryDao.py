@@ -6,11 +6,15 @@ class UserHistoryDao(Dao):
 
     @staticmethod
     async def save(user_history):
+        # Save user login
+
         sql = 'INSERT INTO user_history (login_date, user_id) VALUES (%s, %s);'
         cursor = await UserHistoryDao.DB.execute(sql, [user_history.date, 
                                                        user_history.user_id])
     @staticmethod
     async def get(user):
+        # Retrieve user logins
+
         sql = 'SELECT login_date FROM user_history WHERE user_id=%s'
         cursor = await UserHistoryDao.DB.execute(sql, [user.id])      
         result = cursor.fetchall()                                

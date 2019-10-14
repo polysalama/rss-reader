@@ -17,6 +17,8 @@ class RssParser:
 
     @staticmethod
     async def rss_is_valid(tree):
+        # Validate xml with rss schema
+
         return await IOLoop.current().run_in_executor(None, lambda: RssParser.xml_schema.is_valid(tree))
 
     @staticmethod
@@ -32,16 +34,22 @@ class RssParser:
 
     @staticmethod
     async def fetch_all_rss_content(rss_list):
+        # Fetches xmls for all rss feeds and returns them in a list
+
         http_client = AsyncHTTPClient()
         responses = await multi ([http_client.fetch(rss.link) for rss in rss_list])
         return [response.body for response in responses]
 
     @staticmethod
     async def parse_list_of_rss_xmls(rss_list, all_rss):
+        # Parse all retrieved xmls and return them in list
+
         return await multi ([RssParser.parse_rss_content_to_list(rss_xml, rss.title) for rss_xml, rss in zip(rss_list, all_rss)])
 
     @staticmethod
     async def parse_rss_content_to_list(rss_xml, rss_title):
+        # Parse and store xml content to a dictionary
+
         return_list = []
         tree = await RssParser.xml_to_tree(rss_xml)
         channel = await IOLoop.current().run_in_executor(None, lambda: tree.find('channel'))

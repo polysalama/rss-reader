@@ -9,6 +9,8 @@ class UserDao(Dao):
 
     @staticmethod
     async def save(user):
+        # Save user and return it with new id
+
         sql = 'INSERT INTO users (email, password, created_at) VALUES (%s, %s, %s) RETURNING user_id;'
         cursor = await UserDao.DB.execute(sql, [user.email, 
                                                 user.password, 
@@ -21,7 +23,9 @@ class UserDao(Dao):
 
     @staticmethod
     async def get(user, get_by='user_id'):
-        sql = 'SELECT * FROM users WHERE email=%s'
+        # Retrieve user by id or email
+
+        sql = 'SELECT * FROM users WHERE {}=%s'
         values = [user.id if get_by == 'user_id' else user.email]
         cursor = await UserDao.DB.execute(SQL(sql).format(Identifier(get_by)), 
                                           values)      
