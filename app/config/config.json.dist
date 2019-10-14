@@ -1,6 +1,7 @@
 {
     # App settings
     "port": 8080,
+    "hostname": "localhost", 
     "debug": "True",
 
     # Db connection settings
@@ -8,7 +9,7 @@
     "db_user": "rss",
     "db_password": "rss",
     "db_host": "postgres",
-    "db_port": 5432
+    "db_port": 5432,
 
     # Redis settings
     "redis_host": "redis",
