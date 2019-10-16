@@ -52,7 +52,7 @@ class RssHandler(BaseHandler):
         rss = await RssDao.get(rss)
         # Do not retrive it if exists in db
         if not rss:
-            rss = Rss(link=rss_link)
+            rss = Rss(link=rss_link) 
             # Retrives the xml to read the title
             http_client = AsyncHTTPClient()
             try:

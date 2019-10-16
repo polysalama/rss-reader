@@ -7,7 +7,7 @@ import momoko
 import aioredis
 from handlers import login, register, rss_reader
 from daos.dao import Dao
-
+from concurrent.futures import ProcessPoolExecutor
 
 def get_config():
     try:
@@ -26,7 +26,13 @@ def get_config():
 class Application(web.Application):
     def __init__(self, **settings):
         self.redis = None
+        self.executor = None
+        RssParser.executor = None
+        User.executor = None
         super(Application, self).__init__(**settings)
+
+def setup_executor(app):
+    app.executor = app.settings['num_of_process_executors']
 
 def connect_to_redis(app):
     app.redis = IOLoop.current() \
@@ -92,6 +98,7 @@ if __name__ == '__main__':
     connect_to_db(app)
     create_tables(app.db)
     connect_to_redis(app)
+    setup_executor(app)
     app.listen(app.settings['port'])
     if app.settings['debug']:
         run_debug_smtp()

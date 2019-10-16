@@ -4,6 +4,8 @@ from email.mime.multipart import MIMEMultipart
 import bcrypt
 
 class User(): 
+
+    executor = None
     
     def __init__(self, id=None, email=None, password=None, created_at=None):
             self.id = id
@@ -14,10 +16,7 @@ class User():
     async def check_password(self, input_password):
         # Checks hashed and input password
 
-        matching = await IOLoop.current().run_in_executor(None, 
-                lambda: bcrypt.checkpw(input_password, 
-                                       self.password))
-        return matching
+        return await IOLoop.current().run_in_executor(User.executor, bcrypt.checkpw, input_password, self.password)
 
     async def send_email(self, smtp_client, email_body):
         # Sends conformation mail to user
@@ -33,6 +32,7 @@ class User():
 
     @staticmethod
     async def hash_password(password):
-        return await IOLoop.current().run_in_executor(None, 
-                lambda: bcrypt.hashpw(password, 
-                                      bcrypt.gensalt()))
+        return await IOLoop.current().run_in_executor(User.executor, 
+                                                        bcrypt.hashpw, 
+                                                        password, 
+                                                        bcrypt.gensalt())

@@ -3,6 +3,7 @@
     "port": 8080,
     "hostname": "localhost", 
     "debug": "True",
+    "num_of_process_executors": 4,
 
     # Db connection settings
     "db_name": "rss",
