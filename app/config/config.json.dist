@@ -22,5 +22,5 @@
     "smpt_user": "",
     "smpt_password": "",
 
-    "cookie_secret=": "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__"
+    "cookie_secret": "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__"
 }
